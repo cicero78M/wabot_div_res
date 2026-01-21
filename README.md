@@ -28,6 +28,12 @@ npm run start
 
 Variabel lingkungan yang didukung didokumentasikan di `.env.example`.
 
+### Cron tambahan untuk WA Gateway
+
+- **Polling outbox WA**: cron baru menjalankan `waGateway.dispatchPendingMessages()` secara periodik.
+- **Default**: setiap 2 menit.
+- **Konfigurasi**: atur `WA_GATEWAY_POLL_CRON` untuk mengubah interval tanpa perubahan kode (format cron `node-cron`).
+
 ## WhatsApp Web Gateway (wwebjs)
 
 - **Pairing (QR)**: saat pertama kali dijalankan, log akan menampilkan QR code (ASCII). Scan dengan aplikasi WhatsApp untuk menghubungkan perangkat.
