@@ -1,8 +1,9 @@
 import qrcode from 'qrcode-terminal';
-import { Client, LocalAuth } from 'whatsapp-web.js';
+import whatsappWeb from 'whatsapp-web.js';
 import { createLogger } from '../utils/logger.js';
 
 const logger = createLogger();
+const { Client, LocalAuth } = whatsappWeb;
 
 let clientInstance = null;
 let clientInitialized = false;
