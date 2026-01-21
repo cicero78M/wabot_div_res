@@ -7,7 +7,7 @@ Dokumen ini menjelaskan kerangka sistem untuk refactor backend Cicero_V2.
 1. **Cron job** mengeksekusi rekap sesuai jadwal.
 2. **Module rekap** mengambil data dari view laporan.
 3. **Outbox service** menyimpan pesan ke `wa_outbox`.
-4. **WA gateway** mengambil pesan pending dan mengirim ke client WA.
+4. **WA gateway** mengambil pesan pending dan mengirim ke client WA berbasis `whatsapp-web.js`.
 5. **Module komplain** mengambil komplain pending dan menyusun balasan standar.
 
 ## Modul & Tanggung Jawab
@@ -19,7 +19,7 @@ Dokumen ini menjelaskan kerangka sistem untuk refactor backend Cicero_V2.
 | `modules/complaints` | Query komplain pending dan update status setelah balasan. |
 | `modules/wa-gateway` | Mengirim pesan WA yang telah masuk outbox. |
 | `services/outbox.js` | Menulis pesan ke `wa_outbox`. |
-| `services/wa-client.js` | Placeholder integrasi ke gateway WA. |
+| `services/wa-client.js` | Client WhatsApp Web berbasis `whatsapp-web.js` dengan LocalAuth. |
 
 ## Jadwal Cron (Default)
 
@@ -58,3 +58,9 @@ CREATE TABLE complaint_queue (
 
 - **Satu sumber data**: view laporan & queue komplain.
 - **Mekanisme serupa**: data masuk ke outbox → gateway WA mengirimkan pesan.
+
+## Pairing & Session WhatsApp
+
+- **Pairing QR**: QR code akan muncul di log pertama kali client dijalankan. Scan dengan WhatsApp untuk menghubungkan perangkat.
+- **Session storage**: session tersimpan di disk (`WA_AUTH_PATH`) dengan nama `WA_SESSION_NAME` agar tidak perlu scan ulang.
+- **Runtime dependency**: `whatsapp-web.js` memerlukan Chromium/Puppeteer. Pastikan dependency sistem Chromium terpasang atau gunakan `WA_PUPPETEER_ARGS` untuk argumen tambahan.

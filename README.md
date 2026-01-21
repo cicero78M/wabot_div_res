@@ -28,6 +28,12 @@ npm run start
 
 Variabel lingkungan yang didukung didokumentasikan di `.env.example`.
 
+## WhatsApp Web Gateway (wwebjs)
+
+- **Pairing (QR)**: saat pertama kali dijalankan, log akan menampilkan QR code (ASCII). Scan dengan aplikasi WhatsApp untuk menghubungkan perangkat.
+- **Penyimpanan session**: session disimpan di disk via `LocalAuth` pada path `WA_AUTH_PATH` dengan nama `WA_SESSION_NAME`.
+- **Dependency runtime**: `whatsapp-web.js` memakai Chromium/Puppeteer. Pastikan host memiliki dependency system untuk Chromium/Chrome (mis. `libnss3`, `libxss1`, `libasound2`, `libatk1.0-0`, `libgtk-3-0`). Jika diperlukan, set `WA_PUPPETEER_ARGS` untuk `--no-sandbox` atau argumen lainnya.
+
 ## Catatan Integrasi
 
 - Tabel utama: `wa_outbox`, `complaint_queue`
