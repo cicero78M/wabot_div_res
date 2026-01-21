@@ -34,7 +34,7 @@ flowchart TD
 | `modules/complaints` | Query komplain pending dan update status setelah balasan. |
 | `modules/wa-gateway` | Mengirim pesan WA yang telah masuk outbox. |
 | `services/outbox.js` | Menulis pesan ke `wa_outbox`. |
-| `services/wa-client.js` | Client WhatsApp Web berbasis `whatsapp-web.js` dengan LocalAuth. |
+| `services/wa-client.js` | Client WhatsApp Web berbasis `whatsapp-web.js` dengan default import (CJS) lalu destructure `Client`/`LocalAuth`. |
 
 ## Jadwal Cron (Default)
 
