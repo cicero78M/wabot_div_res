@@ -20,10 +20,13 @@ src/
 ## Menjalankan Aplikasi
 
 ```bash
+cp .env.example .env
 export DATABASE_URL=postgres://user:pass@host:5432/dbname
 npm install
 npm run start
 ```
+
+Variabel lingkungan yang didukung didokumentasikan di `.env.example`.
 
 ## Catatan Integrasi
 
