@@ -10,6 +10,21 @@ Dokumen ini menjelaskan kerangka sistem untuk refactor backend Cicero_V2.
 4. **WA gateway** mengambil pesan pending dan mengirim ke client WA berbasis `whatsapp-web.js`.
 5. **Module komplain** mengambil komplain pending dan menyusun balasan standar.
 
+### Diagram Alur Eksekusi Cron + Gateway
+
+```mermaid
+flowchart TD
+  Cron[node-cron di proses Node] -->|rekap laporan| RekapMod[modules/rekap]
+  Cron -->|respon komplain| ComplaintMod[modules/complaints]
+  RekapMod --> OutboxSvc[services/outbox -> wa_outbox]
+  ComplaintMod --> OutboxSvc
+  OutboxSvc --> Gateway[modules/wa-gateway]
+  Gateway --> WAClient[whatsapp-web.js]
+  Cron -->|polling outbox| Gateway
+  DBViews[(views laporan)] --> RekapMod
+  DBQueue[(complaint_queue)] --> ComplaintMod
+```
+
 ## Modul & Tanggung Jawab
 
 | Modul | Tanggung Jawab |
@@ -35,6 +50,11 @@ Dokumen ini menjelaskan kerangka sistem untuk refactor backend Cicero_V2.
 Gunakan `WA_GATEWAY_POLL_CRON` untuk mengubah jadwal polling outbox WA tanpa perubahan kode. Nilai harus mengikuti format cron `node-cron`. Default: `*/2 * * * *`.
 
 ## Skema Database (Ringkas)
+
+Dependensi schema Cicero_V2 yang harus tersedia:
+
+- **Tabel**: `wa_outbox`, `complaint_queue`
+- **View**: `task_delivery_recap_view`, `daily_report_view`, `weekly_report_view`, `monthly_report_view`
 
 ```sql
 -- Outbox untuk WA
@@ -63,6 +83,10 @@ CREATE TABLE complaint_queue (
 
 - **Satu sumber data**: view laporan & queue komplain.
 - **Mekanisme serupa**: data masuk ke outbox → gateway WA mengirimkan pesan.
+
+## Catatan Cron (Proses Node)
+
+Job cron dijalankan di dalam proses Node aplikasi ini (menggunakan `node-cron`), bukan cron OS. Jika ingin menjalankan via cron OS, jalankan script Node yang memanggil modul rekap/komplain sesuai jadwal di crontab terpisah dan pastikan aplikasi utama tidak menjalankan scheduler duplikat.
 
 ## Pairing & Session WhatsApp
 

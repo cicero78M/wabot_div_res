@@ -21,7 +21,7 @@ src/
 
 ```bash
 cp .env.example .env
-export DATABASE_URL=postgres://user:pass@host:5432/dbname
+export DATABASE_URL=postgres://cicero_user:secret@db-host:5432/Cicero_V2
 npm install
 npm run start
 ```
@@ -33,6 +33,7 @@ Variabel lingkungan yang didukung didokumentasikan di `.env.example`.
 - **Polling outbox WA**: cron baru menjalankan `waGateway.dispatchPendingMessages()` secara periodik.
 - **Default**: setiap 2 menit.
 - **Konfigurasi**: atur `WA_GATEWAY_POLL_CRON` untuk mengubah interval tanpa perubahan kode (format cron `node-cron`).
+- **Cron lain**: jadwal laporan/rekap/komplain dapat diubah lewat `DAILY_REPORT_CRON`, `WEEKLY_REPORT_CRON`, `MONTHLY_REPORT_CRON`, `TASK_DELIVERY_RECAP_CRON`, `COMPLAINT_RESPONSE_CRON`.
 
 ## WhatsApp Web Gateway (wwebjs)
 
@@ -46,3 +47,51 @@ Variabel lingkungan yang didukung didokumentasikan di `.env.example`.
 - View laporan: `task_delivery_recap_view`, `daily_report_view`, `weekly_report_view`, `monthly_report_view`
 
 Detail arsitektur ada di `docs/architecture.md`.
+
+## Koneksi ke DB Cicero_V2
+
+Aplikasi ini bergantung pada tabel dan view berikut:
+
+- **Tabel**: `wa_outbox`, `complaint_queue`
+- **View**: `task_delivery_recap_view`, `daily_report_view`, `weekly_report_view`, `monthly_report_view`
+
+Pastikan DSN `DATABASE_URL` mengarah ke database Cicero_V2 dan akses user memiliki izin SELECT/INSERT/UPDATE sesuai kebutuhan modul.
+
+## Menjalankan sebagai Service
+
+### Contoh systemd
+
+1. Buat file `/etc/systemd/system/cicero-v2.service`:
+   ```
+   [Unit]
+   Description=Cicero_V2 Backend
+   After=network.target
+
+   [Service]
+   Type=simple
+   WorkingDirectory=/opt/cicero-v2
+   EnvironmentFile=/opt/cicero-v2/.env
+   ExecStart=/usr/bin/npm run start
+   Restart=always
+   User=node
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+2. Jalankan:
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now cicero-v2
+   ```
+
+### Contoh PM2
+
+```bash
+pm2 start npm --name cicero-v2 -- run start
+pm2 save
+pm2 startup
+```
+
+## Catatan Cron (Proses Node)
+
+Cron berjalan di dalam proses Node aplikasi ini (menggunakan `node-cron`), bukan cron OS. Jika ingin menjalankan via cron OS, nonaktifkan proses aplikasi (atau jalankan task terpisah) dan buat entry crontab yang memanggil script Node yang menjalankan modul rekap/komplain sesuai kebutuhan.
