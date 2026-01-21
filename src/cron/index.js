@@ -8,6 +8,13 @@ import {
 import { handleComplaintResponses } from '../modules/complaints/index.js';
 
 export const registerCronJobs = ({ db, logger, waGateway }) => {
+  const waGatewayPollCron = process.env.WA_GATEWAY_POLL_CRON || '*/2 * * * *';
+
+  logger.info(
+    { schedule: waGatewayPollCron },
+    'Registering WA gateway polling cron'
+  );
+
   cron.schedule('0 7 * * *', async () => {
     logger.info('Running daily report cron');
     await runDailyReport({ db, logger, waGateway });
@@ -31,5 +38,13 @@ export const registerCronJobs = ({ db, logger, waGateway }) => {
   cron.schedule('*/5 * * * *', async () => {
     logger.info('Running complaint response cron');
     await handleComplaintResponses({ db, logger, waGateway });
+  });
+
+  cron.schedule(waGatewayPollCron, async () => {
+    logger.info(
+      { schedule: waGatewayPollCron },
+      'Running WA gateway polling cron'
+    );
+    await waGateway.dispatchPendingMessages();
   });
 };

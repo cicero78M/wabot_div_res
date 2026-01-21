@@ -14,7 +14,7 @@ Dokumen ini menjelaskan kerangka sistem untuk refactor backend Cicero_V2.
 
 | Modul | Tanggung Jawab |
 | --- | --- |
-| `cron/index.js` | Menjadwalkan rekap harian, mingguan, bulanan, task delivery recap, dan respon komplain. |
+| `cron/index.js` | Menjadwalkan rekap harian, mingguan, bulanan, task delivery recap, respon komplain, serta polling WA gateway. |
 | `modules/rekap` | Query view laporan dan enqueue ke outbox. |
 | `modules/complaints` | Query komplain pending dan update status setelah balasan. |
 | `modules/wa-gateway` | Mengirim pesan WA yang telah masuk outbox. |
@@ -28,6 +28,11 @@ Dokumen ini menjelaskan kerangka sistem untuk refactor backend Cicero_V2.
 - **Monthly report**: 07:00 setiap tanggal 1
 - **Task delivery recap**: setiap 30 menit
 - **Complaint response**: setiap 5 menit
+- **WA gateway polling**: setiap 2 menit (default)
+
+## Konfigurasi Cron WA Gateway
+
+Gunakan `WA_GATEWAY_POLL_CRON` untuk mengubah jadwal polling outbox WA tanpa perubahan kode. Nilai harus mengikuti format cron `node-cron`. Default: `*/2 * * * *`.
 
 ## Skema Database (Ringkas)
 
