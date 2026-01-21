@@ -3,12 +3,14 @@ import { createLogger } from './utils/logger.js';
 import { connectDatabase } from './db/index.js';
 import { registerCronJobs } from './cron/index.js';
 import { createWAGateway } from './modules/wa-gateway/index.js';
+import { initWaClient } from './services/wa-client.js';
 
 const logger = createLogger();
 
 const bootstrap = async () => {
   initConfig();
   const db = await connectDatabase();
+  await initWaClient();
   const waGateway = createWAGateway({ db, logger });
 
   registerCronJobs({ db, logger, waGateway });
